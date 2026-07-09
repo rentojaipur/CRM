@@ -1,3 +1,4 @@
+import { auth } from "./auth";
 import { prisma } from "./prisma";
 import { getTenantContext } from "./tenant-context";
 
@@ -26,4 +27,14 @@ export async function requirePermission(key: string): Promise<void> {
   if (!(await hasPermission(key))) {
     throw new PermissionDeniedError(key);
   }
+}
+
+// Layouts guard page access, but server actions are directly callable
+// endpoints — every super-admin action must re-check the session itself.
+export async function requireSuperAdmin() {
+  const session = await auth();
+  if (!session || session.user.instituteId !== null) {
+    throw new PermissionDeniedError("super-admin");
+  }
+  return session;
 }
