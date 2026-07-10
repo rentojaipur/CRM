@@ -23,7 +23,7 @@ export default async function SuperAdminLayout({ children }: { children: React.R
           </nav>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground">{session.user.name}</span>
+          <Link href="/profile" className="text-sm text-muted-foreground hover:text-foreground hover:underline">{session.user.name}</Link>
           <SignOutButton />
         </div>
       </header>

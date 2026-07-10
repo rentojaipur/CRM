@@ -132,6 +132,7 @@ model User {
   name         String
   email        String     @unique
   phone        String?
+  dob          DateTime?
   passwordHash String
   isActive     Boolean    @default(true)
   lastLoginAt  DateTime?

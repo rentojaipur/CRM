@@ -43,7 +43,7 @@ export default async function RolesPage(props: PageProps<"/settings/roles">) {
 
       <div className="grid gap-6 lg:grid-cols-[1fr_2fr]">
         <div className="space-y-4">
-          <div className="rounded-lg border">
+          <div className="overflow-x-auto rounded-lg border bg-card shadow-sm">
             {roles.map((role) => (
               <Link
                 key={role.id}

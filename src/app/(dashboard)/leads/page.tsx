@@ -17,6 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { LeadStatus } from "@/generated/prisma/enums";
+import { SearchBox } from "@/components/shared/search-box";
 import { SubmitButton } from "@/components/shared/submit-button";
 import { createLead } from "./actions";
 import { statusBadge } from "./status-badge";
@@ -27,7 +28,8 @@ const SOURCES = ["WEBSITE", "WALK_IN", "GOOGLE", "FACEBOOK", "ANTHE", "REFERRAL"
 const STATUS_FILTERS = ["ALL", "NEW", "INTERESTED", "FOLLOWUP", "CONVERTED", "LOST"];
 
 export default async function LeadsPage(props: PageProps<"/leads">) {
-  const { error, status } = await props.searchParams;
+  const { error, status, q } = await props.searchParams;
+  const query = typeof q === "string" ? q.trim() : "";
   const statusFilter =
     typeof status === "string" && STATUS_FILTERS.includes(status) && status !== "ALL"
       ? (status as LeadStatus)
@@ -40,7 +42,12 @@ export default async function LeadsPage(props: PageProps<"/leads">) {
     }
     return {
       leads: await db.lead.findMany({
-        where: statusFilter ? { status: statusFilter } : undefined,
+        where: {
+          ...(statusFilter ? { status: statusFilter } : {}),
+          ...(query
+            ? { OR: [{ name: { contains: query, mode: "insensitive" as const } }, { mobile: { contains: query } }] }
+            : {}),
+        },
         orderBy: { createdAt: "desc" },
         include: { branch: true, assignedTo: true, _count: { select: { followups: true } } },
         take: 100,
@@ -67,11 +74,14 @@ export default async function LeadsPage(props: PageProps<"/leads">) {
           <h1 className="text-xl font-semibold">Leads</h1>
           <p className="text-sm text-muted-foreground">Enquiries and their follow-up pipeline.</p>
         </div>
-        {canCreate && (
-          <Link href="/leads/import" className={buttonVariants({ variant: "outline" })}>
-            Import CSV / Excel
-          </Link>
-        )}
+        <div className="flex items-center gap-2">
+          <SearchBox action="/leads" placeholder="Search name or mobile..." defaultValue={query} />
+          {canCreate && (
+            <Link href="/leads/import" className={buttonVariants({ variant: "outline" })}>
+              Import
+            </Link>
+          )}
+        </div>
       </div>
 
       <div className="flex gap-1 border-b">
@@ -94,7 +104,7 @@ export default async function LeadsPage(props: PageProps<"/leads">) {
           {error && (
             <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>
           )}
-          <div className="rounded-lg border">
+          <div className="overflow-x-auto rounded-lg border bg-card shadow-sm">
             <Table>
               <TableHeader>
                 <TableRow>

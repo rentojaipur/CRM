@@ -1,10 +1,11 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { withTenant } from "@/lib/tenant";
 import { hasPermission } from "@/lib/permissions";
 import { SignOutButton } from "@/components/shared/sign-out-button";
-import { Sidebar, type SidebarItem } from "@/components/shared/sidebar";
+import { MobileNav, Sidebar, type SidebarItem } from "@/components/shared/sidebar";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -38,11 +39,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <div className="flex min-h-screen">
       <Sidebar items={items} instituteName={institute?.name ?? "Institute"} />
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-end gap-3 border-b px-4 py-2.5 print:hidden">
-          <span className="text-sm text-muted-foreground">
+        <header className="flex items-center justify-between gap-3 border-b bg-card px-4 py-2.5 md:justify-end print:hidden">
+          <MobileNav items={items} instituteName={institute?.name ?? "Institute"} />
+          <div className="flex items-center gap-3">
+          <Link href="/profile" className="text-sm text-muted-foreground hover:text-foreground hover:underline">
             {session.user.name} · {session.user.roleName}
-          </span>
-          <SignOutButton />
+          </Link>
+            <SignOutButton />
+          </div>
         </header>
         <main className="flex flex-1">{children}</main>
       </div>

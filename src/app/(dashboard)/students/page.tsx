@@ -2,6 +2,7 @@ import { db } from "@/lib/prisma";
 import { withTenant } from "@/lib/tenant";
 import { hasPermission } from "@/lib/permissions";
 import { Badge } from "@/components/ui/badge";
+import { SearchBox } from "@/components/shared/search-box";
 import {
   Table,
   TableBody,
@@ -13,12 +14,17 @@ import {
 
 const dateFormat = new Intl.DateTimeFormat("en-IN", { dateStyle: "medium" });
 
-export default async function StudentsPage() {
+export default async function StudentsPage(props: PageProps<"/students">) {
+  const { q } = await props.searchParams;
+  const query = typeof q === "string" ? q.trim() : "";
   const { students, canView } = await withTenant(async () => {
     const canView = await hasPermission("student.view");
     if (!canView) return { students: [], canView };
     return {
       students: await db.student.findMany({
+        where: query
+          ? { OR: [{ name: { contains: query, mode: "insensitive" } }, { mobile: { contains: query } }, { rollNumber: { contains: query, mode: "insensitive" } }] }
+          : undefined,
         orderBy: { createdAt: "desc" },
         include: {
           branch: true,
@@ -41,14 +47,17 @@ export default async function StudentsPage() {
 
   return (
     <div className="flex-1 space-y-4 p-6">
-      <div>
-        <h1 className="text-xl font-semibold">Students</h1>
-        <p className="text-sm text-muted-foreground">
-          {students.length} admitted student{students.length === 1 ? "" : "s"}.
-        </p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-semibold">Students</h1>
+          <p className="text-sm text-muted-foreground">
+            {students.length} admitted student{students.length === 1 ? "" : "s"}.
+          </p>
+        </div>
+        <SearchBox action="/students" placeholder="Search name, mobile, roll no..." defaultValue={query} />
       </div>
 
-      <div className="rounded-lg border">
+      <div className="overflow-x-auto rounded-lg border bg-card shadow-sm">
         <Table>
           <TableHeader>
             <TableRow>

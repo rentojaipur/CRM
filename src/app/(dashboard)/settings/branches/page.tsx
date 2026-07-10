@@ -32,7 +32,7 @@ export default async function BranchesPage(props: PageProps<"/settings/branches"
         {error && (
           <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>
         )}
-        <div className="rounded-lg border">
+        <div className="overflow-x-auto rounded-lg border bg-card shadow-sm">
           <Table>
             <TableHeader>
               <TableRow>

@@ -4,6 +4,7 @@ import { withTenant } from "@/lib/tenant";
 import { hasPermission } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { SearchBox } from "@/components/shared/search-box";
 import { SubmitButton } from "@/components/shared/submit-button";
 import {
   Table,
@@ -29,7 +30,8 @@ const approvalBadge: Record<string, string> = {
 const FILTERS = ["ALL", "PENDING", "APPROVED", "REJECTED"];
 
 export default async function AdmissionsPage(props: PageProps<"/admissions">) {
-  const { error, status } = await props.searchParams;
+  const { error, status, q } = await props.searchParams;
+  const query = typeof q === "string" ? q.trim() : "";
   const statusFilter =
     typeof status === "string" && FILTERS.includes(status) && status !== "ALL"
       ? (status as ApprovalStatus)
@@ -40,7 +42,12 @@ export default async function AdmissionsPage(props: PageProps<"/admissions">) {
     if (!canView) return { admissions: [], pendingCount: 0, canView, canApprove: false };
     return {
       admissions: await db.admission.findMany({
-        where: statusFilter ? { approvalStatus: statusFilter } : undefined,
+        where: {
+          ...(statusFilter ? { approvalStatus: statusFilter } : {}),
+          ...(query
+            ? { student: { is: { OR: [{ name: { contains: query, mode: "insensitive" as const } }, { mobile: { contains: query } }] } } }
+            : {}),
+        },
         orderBy: { createdAt: "desc" },
         include: { student: true, course: true, counsellor: true },
         take: 100,
@@ -61,11 +68,12 @@ export default async function AdmissionsPage(props: PageProps<"/admissions">) {
 
   return (
     <div className="flex-1 space-y-4 p-6">
-      <div>
-        <h1 className="text-xl font-semibold">Admissions</h1>
-        <p className="text-sm text-muted-foreground">
-          Course enrolments and their approval state.
-        </p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-semibold">Admissions</h1>
+          <p className="text-sm text-muted-foreground">Course enrolments and their approval state.</p>
+        </div>
+        <SearchBox action="/admissions" placeholder="Search student or mobile..." defaultValue={query} />
       </div>
 
       {pendingCount > 0 && canApprove && (
@@ -92,7 +100,7 @@ export default async function AdmissionsPage(props: PageProps<"/admissions">) {
         ))}
       </div>
 
-      <div className="rounded-lg border">
+      <div className="overflow-x-auto rounded-lg border bg-card shadow-sm">
         <Table>
           <TableHeader>
             <TableRow>

@@ -3,6 +3,7 @@ import { db } from "@/lib/prisma";
 import { withTenant } from "@/lib/tenant";
 import { hasPermission } from "@/lib/permissions";
 import { Badge } from "@/components/ui/badge";
+import { SearchBox } from "@/components/shared/search-box";
 import {
   Table,
   TableBody,
@@ -17,13 +18,20 @@ const dateFormat = new Intl.DateTimeFormat("en-IN", { dateStyle: "medium" });
 
 type InstallmentEntry = { seq: number; amount: number; dueDate: string };
 
-export default async function AccountsPage() {
+export default async function AccountsPage(props: PageProps<"/accounts">) {
+  const { q } = await props.searchParams;
+  const query = typeof q === "string" ? q.trim() : "";
   const { admissions, canView } = await withTenant(async () => {
     const canView = await hasPermission("fee.view");
     if (!canView) return { admissions: [], canView };
     return {
       admissions: await db.admission.findMany({
-        where: { approvalStatus: { in: ["NOT_REQUIRED", "APPROVED"] } },
+        where: {
+          approvalStatus: { in: ["NOT_REQUIRED", "APPROVED"] },
+          ...(query
+            ? { student: { is: { OR: [{ name: { contains: query, mode: "insensitive" as const } }, { mobile: { contains: query } }] } } }
+            : {}),
+        },
         orderBy: { createdAt: "desc" },
         include: { student: true, course: true, feeTransactions: true },
         take: 100,
@@ -60,9 +68,12 @@ export default async function AccountsPage() {
 
   return (
     <div className="flex-1 space-y-4 p-6">
-      <div>
-        <h1 className="text-xl font-semibold">Accounts</h1>
-        <p className="text-sm text-muted-foreground">Fee collection and pending tracking.</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-semibold">Accounts</h1>
+          <p className="text-sm text-muted-foreground">Fee collection and pending tracking.</p>
+        </div>
+        <SearchBox action="/accounts" placeholder="Search student or mobile..." defaultValue={query} />
       </div>
 
       <div className="grid grid-cols-3 gap-3 sm:max-w-xl">
@@ -80,7 +91,7 @@ export default async function AccountsPage() {
         </div>
       </div>
 
-      <div className="rounded-lg border">
+      <div className="overflow-x-auto rounded-lg border bg-card shadow-sm">
         <Table>
           <TableHeader>
             <TableRow>

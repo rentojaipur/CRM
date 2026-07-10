@@ -34,7 +34,7 @@ export default async function CoursesPage(props: PageProps<"/settings/courses">)
         {error && (
           <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>
         )}
-        <div className="rounded-lg border">
+        <div className="overflow-x-auto rounded-lg border bg-card shadow-sm">
           <Table>
             <TableHeader>
               <TableRow>
