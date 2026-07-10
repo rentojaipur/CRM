@@ -22,9 +22,11 @@ const EXPORTS = [
 ];
 
 export default async function ReportsPage() {
-  const { canView, counsellors, sources } = await withTenant(async () => {
-    const canView = await hasPermission("reports.view");
-    if (!canView) return { canView, counsellors: [], sources: [] };
+  const { canView, canReports, counsellors, sources } = await withTenant(async () => {
+    const canReports = await hasPermission("reports.view");
+    const canFees = await hasPermission("fee.view");
+    const canView = canReports || canFees;
+    if (!canReports) return { canView, canReports, counsellors: [], sources: [] };
 
     const users = await db.user.findMany({ where: { isActive: true }, orderBy: { name: "asc" } });
     const counsellors = await Promise.all(
@@ -60,7 +62,7 @@ export default async function ReportsPage() {
       }))
       .sort((a, b) => b.count - a.count);
 
-    return { canView, counsellors: counsellors.filter((c) => c.assignedLeads + c.admissions > 0), sources };
+    return { canView, canReports, counsellors: counsellors.filter((c) => c.assignedLeads + c.admissions > 0), sources };
   });
 
   if (!canView) {
@@ -84,7 +86,7 @@ export default async function ReportsPage() {
           <CardDescription>Download your institute&apos;s data as CSV or Excel.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-x-6 gap-y-3">
-          {EXPORTS.map((item) => (
+          {EXPORTS.filter((item) => canReports || item.entity === "fees").map((item) => (
             <div key={item.entity} className="flex items-center gap-2">
               <span className="text-sm">{item.label}:</span>
               <a
@@ -106,6 +108,7 @@ export default async function ReportsPage() {
         </CardContent>
       </Card>
 
+      {canReports && (
       <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
         <Card>
           <CardHeader>
@@ -169,6 +172,7 @@ export default async function ReportsPage() {
           </CardContent>
         </Card>
       </div>
+      )}
     </div>
   );
 }

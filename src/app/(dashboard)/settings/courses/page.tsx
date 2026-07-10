@@ -28,6 +28,10 @@ export default async function CoursesPage(props: PageProps<"/settings/courses">)
     canManage: await hasPermission("course.manage"),
   }));
 
+  if (!canManage) {
+    return <p className="text-sm text-muted-foreground">You don&apos;t have access to course settings.</p>;
+  }
+
   return (
     <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
       <div className="space-y-3">

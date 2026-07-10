@@ -19,7 +19,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
       students: await hasPermission("student.view"),
       admissions: await hasPermission("admission.view"),
       accounts: await hasPermission("fee.view"),
-      reports: await hasPermission("reports.view"),
+      reports: (await hasPermission("reports.view")) || (await hasPermission("fee.view")),
+      settings:
+        (await hasPermission("branch.manage")) ||
+        (await hasPermission("course.manage")) ||
+        (await hasPermission("user.manage")) ||
+        (await hasPermission("role.manage")),
     },
   }));
 
@@ -32,7 +37,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       : []),
     ...(permissions.accounts ? [{ label: "Accounts", href: "/accounts", icon: "accounts" as const }] : []),
     ...(permissions.reports ? [{ label: "Reports", href: "/reports", icon: "reports" as const }] : []),
-    { label: "Settings", href: "/settings", icon: "settings" },
+    ...(permissions.settings ? [{ label: "Settings", href: "/settings", icon: "settings" as const }] : []),
   ];
 
   return (

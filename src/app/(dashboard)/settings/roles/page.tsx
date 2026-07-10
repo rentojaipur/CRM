@@ -25,6 +25,10 @@ export default async function RolesPage(props: PageProps<"/settings/roles">) {
     canManage: await hasPermission("role.manage"),
   }));
 
+  if (!canManage) {
+    return <p className="text-sm text-muted-foreground">You don&apos;t have access to roles.</p>;
+  }
+
   const selectedRole = roles.find((r) => r.id === selectedRoleId) ?? roles[0];
   const grantedKeys = new Set(selectedRole?.rolePermissions.map((rp) => rp.permission.key) ?? []);
 

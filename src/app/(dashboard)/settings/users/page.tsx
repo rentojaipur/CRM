@@ -32,6 +32,10 @@ export default async function UsersPage(props: PageProps<"/settings/users">) {
     canManage: await hasPermission("user.manage"),
   }));
 
+  if (!canManage) {
+    return <p className="text-sm text-muted-foreground">You don&apos;t have access to user management.</p>;
+  }
+
   return (
     <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
       <div className="space-y-3">

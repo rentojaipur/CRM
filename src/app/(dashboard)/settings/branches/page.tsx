@@ -26,6 +26,10 @@ export default async function BranchesPage(props: PageProps<"/settings/branches"
     canManage: await hasPermission("branch.manage"),
   }));
 
+  if (!canManage) {
+    return <p className="text-sm text-muted-foreground">You don&apos;t have access to branch settings.</p>;
+  }
+
   return (
     <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
       <div className="space-y-3">

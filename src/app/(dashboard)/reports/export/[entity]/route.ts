@@ -11,7 +11,11 @@ export async function GET(request: NextRequest, ctx: RouteContext<"/reports/expo
   const format = request.nextUrl.searchParams.get("format");
 
   return withTenant(async () => {
-    if (!(await hasPermission("reports.view"))) {
+    // Fees export is available to accounts staff (fee.view); every other
+    // entity needs the full reports permission.
+    const canReports = await hasPermission("reports.view");
+    const allowed = entity === "fees" ? canReports || (await hasPermission("fee.view")) : canReports;
+    if (!allowed) {
       return new Response("Forbidden", { status: 403 });
     }
 
