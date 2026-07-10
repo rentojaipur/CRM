@@ -4,7 +4,7 @@ import { withTenant } from "@/lib/tenant";
 import { hasPermission } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/shared/submit-button";
 import {
   Table,
   TableBody,
@@ -144,16 +144,12 @@ export default async function AdmissionsPage(props: PageProps<"/admissions">) {
                         <form action={reviewAdmission}>
                           <input type="hidden" name="admissionId" value={admission.id} />
                           <input type="hidden" name="decision" value="APPROVED" />
-                          <Button type="submit" size="sm" variant="outline" className="text-green-700">
-                            Approve
-                          </Button>
+                          <SubmitButton size="sm" variant="outline" className="text-green-700">Approve</SubmitButton>
                         </form>
                         <form action={reviewAdmission}>
                           <input type="hidden" name="admissionId" value={admission.id} />
                           <input type="hidden" name="decision" value="REJECTED" />
-                          <Button type="submit" size="sm" variant="ghost" className="text-destructive">
-                            Reject
-                          </Button>
+                          <SubmitButton size="sm" variant="ghost" className="text-destructive">Reject</SubmitButton>
                         </form>
                       </div>
                     ) : (

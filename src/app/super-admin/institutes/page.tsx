@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { SubmitButton } from "@/components/shared/submit-button";
 import {
   Table,
   TableBody,
@@ -86,9 +87,7 @@ export default async function InstitutesPage() {
                       name="status"
                       value={institute.status === "SUSPENDED" ? "ACTIVE" : "SUSPENDED"}
                     />
-                    <Button type="submit" variant="ghost" size="sm">
-                      {institute.status === "SUSPENDED" ? "Activate" : "Suspend"}
-                    </Button>
+                    <SubmitButton variant="ghost" size="sm">{institute.status === "SUSPENDED" ? "Activate" : "Suspend"}</SubmitButton>
                   </form>
                 </TableCell>
               </TableRow>

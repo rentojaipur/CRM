@@ -4,7 +4,6 @@ import { withTenant } from "@/lib/tenant";
 import { hasPermission } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { LeadStatus } from "@/generated/prisma/enums";
+import { SubmitButton } from "@/components/shared/submit-button";
 import { createLead } from "./actions";
 import { statusBadge } from "./status-badge";
 
@@ -223,7 +223,7 @@ export default async function LeadsPage(props: PageProps<"/leads">) {
                     ))}
                   </select>
                 </div>
-                <Button type="submit">Create lead</Button>
+                <SubmitButton pendingText="Creating...">Create lead</SubmitButton>
               </form>
             </CardContent>
           </Card>

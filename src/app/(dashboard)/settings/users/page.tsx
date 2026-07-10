@@ -2,7 +2,6 @@ import { db } from "@/lib/prisma";
 import { withTenant } from "@/lib/tenant";
 import { hasPermission } from "@/lib/permissions";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +13,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { PasswordInput } from "@/components/shared/password-input";
+import { SubmitButton } from "@/components/shared/submit-button";
 import { createUser, toggleUserActive } from "./actions";
 
 const dateFormat = new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", timeStyle: "short" });
@@ -73,9 +74,7 @@ export default async function UsersPage(props: PageProps<"/settings/users">) {
                     <TableCell className="text-right">
                       <form action={toggleUserActive} className="inline">
                         <input type="hidden" name="userId" value={user.id} />
-                        <Button type="submit" variant="ghost" size="sm">
-                          {user.isActive ? "Deactivate" : "Activate"}
-                        </Button>
+                        <SubmitButton variant="ghost" size="sm">{user.isActive ? "Deactivate" : "Activate"}</SubmitButton>
                       </form>
                     </TableCell>
                   )}
@@ -109,7 +108,7 @@ export default async function UsersPage(props: PageProps<"/settings/users">) {
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="password">Password *</Label>
-                  <Input id="password" name="password" type="password" minLength={8} required />
+                  <PasswordInput id="password" name="password" minLength={8} required />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -144,7 +143,7 @@ export default async function UsersPage(props: PageProps<"/settings/users">) {
                   </select>
                 </div>
               </div>
-              <Button type="submit">Add user</Button>
+              <SubmitButton pendingText="Adding...">Add user</SubmitButton>
             </form>
           </CardContent>
         </Card>

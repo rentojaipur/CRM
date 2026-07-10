@@ -1,7 +1,7 @@
 import { db } from "@/lib/prisma";
 import { withTenant } from "@/lib/tenant";
 import { hasPermission } from "@/lib/permissions";
-import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/shared/submit-button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -68,9 +68,7 @@ export default async function CoursesPage(props: PageProps<"/settings/courses">)
                     <TableCell className="text-right">
                       <form action={deleteCourse} className="inline">
                         <input type="hidden" name="courseId" value={course.id} />
-                        <Button type="submit" variant="ghost" size="sm" className="text-destructive">
-                          Delete
-                        </Button>
+                        <SubmitButton variant="ghost" size="sm" className="text-destructive">Delete</SubmitButton>
                       </form>
                     </TableCell>
                   )}
@@ -122,7 +120,7 @@ export default async function CoursesPage(props: PageProps<"/settings/courses">)
                   />
                 </div>
               </div>
-              <Button type="submit">Add course</Button>
+              <SubmitButton pendingText="Adding...">Add course</SubmitButton>
             </form>
           </CardContent>
         </Card>

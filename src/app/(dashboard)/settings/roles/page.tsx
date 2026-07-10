@@ -4,7 +4,7 @@ import { withTenant } from "@/lib/tenant";
 import { hasPermission } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/shared/submit-button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -82,7 +82,7 @@ export default async function RolesPage(props: PageProps<"/settings/roles">) {
                     </Label>
                     <Input id="name" name="name" placeholder="Role name" required />
                   </div>
-                  <Button type="submit">Create</Button>
+                  <SubmitButton pendingText="Creating...">Create</SubmitButton>
                 </form>
               </CardContent>
             </Card>
@@ -104,9 +104,7 @@ export default async function RolesPage(props: PageProps<"/settings/roles">) {
                 {canManage && !selectedRole.isSystem && selectedRole._count.users === 0 && (
                   <form action={deleteRole}>
                     <input type="hidden" name="roleId" value={selectedRole.id} />
-                    <Button type="submit" variant="ghost" size="sm" className="text-destructive">
-                      Delete role
-                    </Button>
+                    <SubmitButton variant="ghost" size="sm" className="text-destructive">Delete role</SubmitButton>
                   </form>
                 )}
               </div>
@@ -139,7 +137,7 @@ export default async function RolesPage(props: PageProps<"/settings/roles">) {
                     </div>
                   </fieldset>
                 ))}
-                {canManage && !selectedRole.isSystem && <Button type="submit">Save permissions</Button>}
+                {canManage && !selectedRole.isSystem && <SubmitButton pendingText="Saving...">Save permissions</SubmitButton>}
               </form>
             </CardContent>
           </Card>

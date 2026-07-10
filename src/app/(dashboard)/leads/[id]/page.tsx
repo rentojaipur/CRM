@@ -4,7 +4,8 @@ import { db } from "@/lib/prisma";
 import { withTenant } from "@/lib/tenant";
 import { hasPermission } from "@/lib/permissions";
 import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { SubmitButton } from "@/components/shared/submit-button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -98,9 +99,7 @@ export default async function LeadDetailPage(props: PageProps<"/leads/[id]">) {
                 </option>
               ))}
             </select>
-            <Button type="submit" variant="outline">
-              Update status
-            </Button>
+            <SubmitButton variant="outline" pendingText="Updating...">Update status</SubmitButton>
           </form>
         )}
       </div>
@@ -186,7 +185,7 @@ export default async function LeadDetailPage(props: PageProps<"/leads/[id]">) {
                       <Input id="discountReason" name="discountReason" placeholder="If above limit" />
                     </div>
                   </div>
-                  <Button type="submit">Create admission</Button>
+                  <SubmitButton pendingText="Creating...">Create admission</SubmitButton>
                 </form>
               </CardContent>
             </Card>
@@ -221,7 +220,7 @@ export default async function LeadDetailPage(props: PageProps<"/leads/[id]">) {
                       <Label htmlFor="nextFollowupDate">Next follow-up</Label>
                       <Input id="nextFollowupDate" name="nextFollowupDate" type="date" />
                     </div>
-                    <Button type="submit">Add follow-up</Button>
+                    <SubmitButton pendingText="Adding...">Add follow-up</SubmitButton>
                   </div>
                 </form>
               </CardContent>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
   Card,
@@ -11,6 +11,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { PasswordInput } from "@/components/shared/password-input";
+import { SubmitButton } from "@/components/shared/submit-button";
 import { createInstitute } from "../actions";
 
 export default async function NewInstitutePage(props: PageProps<"/super-admin/institutes/new">) {
@@ -103,10 +105,9 @@ export default async function NewInstitutePage(props: PageProps<"/super-admin/in
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="adminPassword">Admin password *</Label>
-                <Input
+                <PasswordInput
                   id="adminPassword"
                   name="adminPassword"
-                  type="password"
                   minLength={8}
                   placeholder="At least 8 characters"
                   required
@@ -117,7 +118,7 @@ export default async function NewInstitutePage(props: PageProps<"/super-admin/in
                 <Link href="/super-admin/institutes" className={buttonVariants({ variant: "outline" })}>
                   Cancel
                 </Link>
-                <Button type="submit">Create institute</Button>
+                <SubmitButton pendingText="Creating...">Create institute</SubmitButton>
               </div>
             </CardContent>
           </Card>

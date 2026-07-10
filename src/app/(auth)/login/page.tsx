@@ -1,10 +1,11 @@
 import { AuthError } from "next-auth";
 import { redirect } from "next/navigation";
 import { auth, signIn } from "@/lib/auth";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/shared/password-input";
+import { SubmitButton } from "@/components/shared/submit-button";
 
 async function login(formData: FormData) {
   "use server";
@@ -50,11 +51,11 @@ export default async function LoginPage(props: PageProps<"/login">) {
           </div>
           <div className="grid gap-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" name="password" type="password" required />
+            <PasswordInput id="password" name="password" required />
           </div>
-          <Button type="submit" className="w-full">
+          <SubmitButton className="w-full" pendingText="Signing in...">
             Sign in
-          </Button>
+          </SubmitButton>
         </form>
       </CardContent>
     </Card>
