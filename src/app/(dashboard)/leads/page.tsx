@@ -4,6 +4,7 @@ import { withTenant } from "@/lib/tenant";
 import { hasPermission } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -61,9 +62,16 @@ export default async function LeadsPage(props: PageProps<"/leads">) {
 
   return (
     <div className="flex-1 space-y-4 p-6">
-      <div>
-        <h1 className="text-xl font-semibold">Leads</h1>
-        <p className="text-sm text-muted-foreground">Enquiries and their follow-up pipeline.</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-semibold">Leads</h1>
+          <p className="text-sm text-muted-foreground">Enquiries and their follow-up pipeline.</p>
+        </div>
+        {canCreate && (
+          <Link href="/leads/import" className={buttonVariants({ variant: "outline" })}>
+            Import CSV / Excel
+          </Link>
+        )}
       </div>
 
       <div className="flex gap-1 border-b">
