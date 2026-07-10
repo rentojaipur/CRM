@@ -27,7 +27,8 @@ const TENANT_SCOPED_MODELS = new Set([
   "Course",
   "Batch",
   "Lead",
-  "Followup",
+  // Followup has no instituteId column — it is tenant-scoped through its
+  // lead, so always reach followups via an already-scoped Lead query.
   "Student",
   "Admission",
   "ApprovalRequest",
