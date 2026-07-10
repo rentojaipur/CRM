@@ -75,6 +75,9 @@ export async function createInstitute(formData: FormData) {
         data: {
           instituteId: institute.id,
           name: roleName,
+          // Institute Admin is the master role — protected from edits in the
+          // permission builder so an admin can't lock themselves out.
+          isSystem: roleName === "Institute Admin",
           rolePermissions: {
             create: permissionKeys.flatMap((key) => {
               const permissionId = permissionIdByKey.get(key);

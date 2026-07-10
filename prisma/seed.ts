@@ -57,10 +57,13 @@ async function main() {
 
   const roleIdByName = new Map<string, string>();
   for (const [roleName, permissionKeys] of Object.entries(ROLE_TEMPLATES)) {
+    // Institute Admin is the master role — isSystem protects it from edits
+    // in the permission builder so an admin can't lock themselves out.
+    const isSystem = roleName === "Institute Admin";
     const role = await prisma.role.upsert({
       where: { instituteId_name: { instituteId: demoInstitute.id, name: roleName } },
-      update: {},
-      create: { instituteId: demoInstitute.id, name: roleName, isSystem: false },
+      update: { isSystem },
+      create: { instituteId: demoInstitute.id, name: roleName, isSystem },
     });
     roleIdByName.set(roleName, role.id);
 
