@@ -11,7 +11,10 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { addFollowup, updateLeadStatus } from "../actions";
+import { createAdmission } from "../../admissions/actions";
 import { statusBadge } from "../status-badge";
+
+const inr = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
 
 const dateTime = new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", timeStyle: "short" });
 const dateOnly = new Intl.DateTimeFormat("en-IN", { dateStyle: "medium" });
@@ -22,20 +25,23 @@ export default async function LeadDetailPage(props: PageProps<"/leads/[id]">) {
   const { id } = await props.params;
   const { error } = await props.searchParams;
 
-  const { lead, canView, canFollowup } = await withTenant(async () => {
+  const { lead, courses, canView, canFollowup, canAdmit } = await withTenant(async () => {
     const canView = await hasPermission("lead.view");
-    if (!canView) return { lead: null, canView, canFollowup: false };
+    if (!canView) return { lead: null, courses: [], canView, canFollowup: false, canAdmit: false };
     return {
       lead: await db.lead.findFirst({
         where: { id },
         include: {
           branch: true,
           assignedTo: true,
+          student: true,
           followups: { orderBy: { createdAt: "desc" }, include: { createdBy: true } },
         },
       }),
+      courses: await db.course.findMany({ orderBy: { name: "asc" } }),
       canView,
       canFollowup: await hasPermission("lead.followup"),
+      canAdmit: await hasPermission("admission.create"),
     };
   });
 
@@ -121,6 +127,75 @@ export default async function LeadDetailPage(props: PageProps<"/leads/[id]">) {
         </Card>
 
         <div className="space-y-4">
+          {canAdmit && !lead.student && lead.status !== "LOST" && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Convert to admission</CardTitle>
+                <CardDescription>
+                  Enrol this lead into a course. Scholarship above the course limit goes for approval.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form action={createAdmission} className="grid gap-4">
+                  <input type="hidden" name="leadId" value={lead.id} />
+                  <div className="grid gap-2">
+                    <Label htmlFor="courseId">Course *</Label>
+                    <select
+                      id="courseId"
+                      name="courseId"
+                      required
+                      className="border-input h-9 rounded-md border bg-transparent px-3 text-sm shadow-xs"
+                    >
+                      {courses.map((course) => (
+                        <option key={course.id} value={course.id}>
+                          {course.name} — {inr.format(Number(course.mrpFee))} (max scholarship{" "}
+                          {Number(course.maxScholarshipPercent)}%)
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="scholarshipPercent">Scholarship %</Label>
+                      <Input
+                        id="scholarshipPercent"
+                        name="scholarshipPercent"
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="1"
+                        defaultValue="0"
+                        required
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="installments">Installments</Label>
+                      <Input
+                        id="installments"
+                        name="installments"
+                        type="number"
+                        min="1"
+                        max="12"
+                        step="1"
+                        defaultValue="1"
+                        required
+                      />
+                    </div>
+                    <div className="col-span-1 grid gap-2">
+                      <Label htmlFor="discountReason">Discount reason</Label>
+                      <Input id="discountReason" name="discountReason" placeholder="If above limit" />
+                    </div>
+                  </div>
+                  <Button type="submit">Create admission</Button>
+                </form>
+              </CardContent>
+            </Card>
+          )}
+          {lead.student && (
+            <p className="rounded-md border border-green-600/40 bg-green-600/10 px-3 py-2 text-sm text-green-700">
+              Admitted as student — see the Admissions page.
+            </p>
+          )}
           {canFollowup && (
             <Card>
               <CardHeader>
